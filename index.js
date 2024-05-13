@@ -28,6 +28,7 @@ async function run() {
         await client.connect();
 
         const database = client.db('wisdomDB')
+        const allBooksCollection = database.collection('allBooks')
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
