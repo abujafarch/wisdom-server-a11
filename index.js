@@ -39,8 +39,34 @@ async function run() {
 
         app.get('/update-books/:id', async (req, res) => {
             const id = req.params.id
-            const query = {_id: new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const result = await allBooksCollection.findOne(query)
+            res.send(result)
+        })
+
+        app.put('/update-books/:id', async (req, res) => {
+            const id = req.params.id
+            const updatedBook = req.body
+            console.log(updatedBook)
+            const filter = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    bookName: updatedBook.bookName,
+                    image: updatedBook.image,
+                    category: updatedBook.category,
+                    author: updatedBook.author,
+                    rating: updatedBook.rating,
+                }
+            }
+            const result = await allBooksCollection.updateOne(filter, updatedDoc)
+            res.send(result)
+        })
+
+        app.get('/books-category/:category', async (req, res) => {
+            const category = req.params.category
+            console.log(category);
+            const query = { category: category }
+            const result = await allBooksCollection.find(query).toArray()
             res.send(result)
         })
 
