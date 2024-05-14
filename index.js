@@ -29,6 +29,7 @@ async function run() {
 
         const database = client.db('wisdomDB')
         const allBooksCollection = database.collection('allBooks')
+        const borrowedBooksCollection = database.collection('borrowedBooks')
 
         app.post('/all-books', async (req, res) => {
             const book = req.body
@@ -75,6 +76,23 @@ async function run() {
             const query = { _id: new ObjectId(id) }
             const result = await allBooksCollection.findOne(query)
             res.send(result)
+        })
+
+        app.post('/borrow-book', async (req, res) => {
+            const borrowedPerson = req.body
+            const result = await borrowedBooksCollection.insertOne(borrowedPerson)
+            console.log(borrowedPerson);
+            res.send(result)
+        })
+
+        app.put('/all-books/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            // const quantity = req.body
+            const result = await allBooksCollection.updateOne(query, { $inc: { quantity: -1 } })
+            res.send(result)
+
+            // console.log(parseInt(quantity.quantity), id);
         })
 
         app.get('/all-books', async (req, res) => {
