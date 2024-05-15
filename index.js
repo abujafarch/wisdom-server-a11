@@ -95,6 +95,13 @@ async function run() {
             // console.log(parseInt(quantity.quantity), id);
         })
 
+        app.get('/borrowed-books', async (req, res) => {
+            const email = req.query.email
+            const query = { borrowedPersonEmail: email }
+            const result = await borrowedBooksCollection.find(query).toArray()
+            res.send(result)
+        })
+
         app.get('/all-books', async (req, res) => {
             // const query = {}
             const result = await allBooksCollection.find().toArray()
