@@ -81,16 +81,22 @@ async function run() {
         app.post('/borrow-book', async (req, res) => {
             const borrowedPerson = req.body
             const result = await borrowedBooksCollection.insertOne(borrowedPerson)
-            console.log(borrowedPerson);
+            // console.log(borrowedPerson);
             res.send(result)
         })
 
         app.put('/all-books/:id', async (req, res) => {
             const id = req.params.id
+            // const returnMethod = req.body.return
             const query = { _id: new ObjectId(id) }
-            // const quantity = req.body
-            const result = await allBooksCollection.updateOne(query, { $inc: { quantity: -1 } })
-            res.send(result)
+            if (req.body?.return === 'return') {
+                const result = await allBooksCollection.updateOne(query, { $inc: { quantity: +1 } })
+                res.send(result)
+            }
+            else {
+                const result = await allBooksCollection.updateOne(query, { $inc: { quantity: -1 } })
+                res.send(result)
+            }
 
             // console.log(parseInt(quantity.quantity), id);
         })
@@ -99,6 +105,14 @@ async function run() {
             const email = req.query.email
             const query = { borrowedPersonEmail: email }
             const result = await borrowedBooksCollection.find(query).toArray()
+            res.send(result)
+        })
+
+        app.delete('/borrowed-books', async (req, res) => {
+            const borrowedId = req.query.borrowedId
+            const email = req.query.email
+            const query = { _id: new ObjectId(borrowedId) }
+            const result = await borrowedBooksCollection.deleteOne(query)
             res.send(result)
         })
 
