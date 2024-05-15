@@ -65,7 +65,7 @@ async function run() {
 
         app.get('/books-category/:category', async (req, res) => {
             const category = req.params.category
-            console.log(category);
+            // console.log(category);
             const query = { category: category }
             const result = await allBooksCollection.find(query).toArray()
             res.send(result)
@@ -80,14 +80,23 @@ async function run() {
 
         app.post('/borrow-book', async (req, res) => {
             const borrowedPerson = req.body
-            const result = await borrowedBooksCollection.insertOne(borrowedPerson)
-            // console.log(borrowedPerson);
-            res.send(result)
+            const borrowedBookId = borrowedPerson.borrowedBookId
+            console.log(borrowedBookId);
+            const query = { borrowedBookId: borrowedBookId }
+            const verifyBorrowedBooks = await borrowedBooksCollection.findOne(query)
+            console.log(verifyBorrowedBooks);
+            if (verifyBorrowedBooks === null) {
+                const result = await borrowedBooksCollection.insertOne(borrowedPerson)
+                res.send(result)
+            }
+            else {
+                res.send({ bookAlreadyHas: true })
+            }
+
         })
 
         app.put('/all-books/:id', async (req, res) => {
             const id = req.params.id
-            // const returnMethod = req.body.return
             const query = { _id: new ObjectId(id) }
             if (req.body?.return === 'return') {
                 const result = await allBooksCollection.updateOne(query, { $inc: { quantity: +1 } })
@@ -97,8 +106,6 @@ async function run() {
                 const result = await allBooksCollection.updateOne(query, { $inc: { quantity: -1 } })
                 res.send(result)
             }
-
-            // console.log(parseInt(quantity.quantity), id);
         })
 
         app.get('/borrowed-books', async (req, res) => {
@@ -117,7 +124,6 @@ async function run() {
         })
 
         app.get('/all-books', async (req, res) => {
-            // const query = {}
             const result = await allBooksCollection.find().toArray()
             res.send(result)
         })
