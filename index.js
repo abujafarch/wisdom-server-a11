@@ -88,8 +88,10 @@ async function run() {
         app.post('/borrow-book', async (req, res) => {
             const borrowedPerson = req.body
             const borrowedBookId = borrowedPerson.borrowedBookId
+            const borrowedPersonEmail = borrowedPerson.borrowedPersonEmail
             console.log(borrowedBookId);
-            const query = { borrowedBookId: borrowedBookId }
+            const query = { $and: [{ borrowedBookId: borrowedBookId }, { borrowedPersonEmail: borrowedPersonEmail }] }
+
             const verifyBorrowedBooks = await borrowedBooksCollection.findOne(query)
             console.log(verifyBorrowedBooks);
             if (verifyBorrowedBooks === null) {
